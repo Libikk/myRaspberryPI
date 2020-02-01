@@ -4,15 +4,37 @@ const app = express()
 const port = 3333
 const shellExec = require('shell-exec')
 const { tempReadings } = require('./fanControl');
+const hdc1080 = require('./temp-hdc1080/hdc-1080reader');
+
+const images = {
+	DHT10: "https://gr33nonline.files.wordpress.com/2015/09/5-pcs-lot-single-bus-dht11-digital-temperature-and-humidity-sensor-dht11-probe-090345.jpg",
+	HDC1080: "https://www.ezgiz.com/wp-content/uploads/2017/08/gy213v-hdc1080-high-accuracy-digital-humidity-with-temperature-sensor-module-3383.jpg"
+}
 
 
-app.get('/room', (req, res) => {
+const getDHT10Reading = () => new Promise((resolve, reject) => {
 	sensor.read(11, 4, function(err, temperature, humidity) {
-  		if (err) return console.error(err)
-		const temps = `Room temperature: <span style="font-weight: bold; font-size:20; color: green;">${temperature}&#8451;, humidity: ${humidity}%<span>`;
-		console.log(temps)
-		res.send(temps)
+		if (err) return reject(err)
+		resolve({ temperature, humidity })
 	});
+})
+
+app.get('/room', async (req, res) => {
+	const wrapIntoTemplate = (temp, humi, title) => {
+		return `<div>
+			<h1>${title} sensor</h1>
+			<img src=${images[title]} style="width: 200px; height: 200px;">
+			<div>Room temperature: <span style="font-weight: bold; font-size:20; color: green;">${temp} &#8451;<span></div>
+			<div>Room humidity: <span style="font-weight: bold; font-size:20; color: green;">${humi} %<span></div>
+		</div>`
+	}
+	const HDT10 = await getDHT10Reading().then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'DHT10'))
+
+	const hdc1080Res = await hdc1080()
+		.then(r => JSON.parse(r))
+		.then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'HDC1080'))
+
+	res.send(HDT10 + '     ' + hdc1080Res);
 })
 
 app.get('/processor', (req, res) => {
