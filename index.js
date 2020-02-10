@@ -1,10 +1,13 @@
 const sensor = require("node-dht-sensor");
 const express = require('express')
 const app = express()
+require('dotenv').config()
 const port = 3333
-const shellExec = require('shell-exec')
 const { tempReadings } = require('./fanControl');
 const hdc1080 = require('./temp-hdc1080/hdc-1080reader');
+
+const schedule = require('node-schedule');
+const dayjs = require('dayjs');
 
 const images = {
 	DHT10: "https://gr33nonline.files.wordpress.com/2015/09/5-pcs-lot-single-bus-dht11-digital-temperature-and-humidity-sensor-dht11-probe-090345.jpg",
@@ -18,6 +21,17 @@ const getDHT10Reading = () => new Promise((resolve, reject) => {
 		resolve({ temperature, humidity })
 	});
 })
+
+
+schedule.scheduleJob({ hour: 2, minute: 30 }, async () => {
+    const endTime = dayjs().add(2, 'hours');
+	const restart = require('./restart');
+
+    while (dayjs().isBefore(endTime)) {
+        await restart(false);
+    }
+});
+
 
 app.get('/room', async (req, res) => {
 	const wrapIntoTemplate = (temp, humi, title) => {
