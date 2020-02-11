@@ -53,5 +53,5 @@ const restart = async (devMode = true) => {
         console.log(err)
     }
 }
-restart();
+
 module.exports = restart;
