@@ -16,8 +16,8 @@ const restart = async (devMode = true) => {
         });
         page.setDefaultNavigationTimeout(defaultNavTimeout)
         await page.goto('http://192.168.0.1');
-        await page.type('#login_username', process.env.ROUTER__LOGIN);
-        await page.type('#login_password', process.env.ROUTER__PASSWORD);
+        await page.type('#login_username', `${process.env.ROUTER__LOGIN}`);
+        await page.type('#login_password', `${process.env.ROUTER__PASSWORD}`);
         await page.keyboard.press('Enter');
         await page.click('#btnLogin');
         
