@@ -12,5 +12,6 @@ pir.watch((err, value) => {
 
     } else {
         console.log('End', new Date());
+	console.log('______________')
     }
 });

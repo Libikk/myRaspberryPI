@@ -8,6 +8,7 @@ const hdc1080 = require('./temp-hdc1080/hdc-1080reader');
 require('./motionSensor');
 const schedule = require('node-schedule');
 const dayjs = require('dayjs');
+const axios = require('axios');
 
 const images = {
 	DHT10: "https://gr33nonline.files.wordpress.com/2015/09/5-pcs-lot-single-bus-dht11-digital-temperature-and-humidity-sensor-dht11-probe-090345.jpg",
@@ -32,7 +33,6 @@ const getDHT10Reading = () => new Promise((resolve, reject) => {
 //     }
 // });
 
-
 app.get('/room', async (req, res) => {
 	const wrapIntoTemplate = (temp, humi, title) => {
 		return `<div>
@@ -42,18 +42,24 @@ app.get('/room', async (req, res) => {
 			<div>Room humidity: <span style="font-weight: bold; font-size:20; color: green;">${humi} %<span></div>
 		</div>`
 	}
-	const HDT10 = await getDHT10Reading().then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'DHT10'))
+	// const HDT10 = await getDHT10Reading().then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'DHT10'))
 
-	const hdc1080Res = await hdc1080()
-		.then(r => JSON.parse(r))
+	const hdc1080Res = await axios.get('http://192.168.1.103/')
+		.then(r => r.data)
 		.then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'HDC1080'))
 
-	res.send(HDT10 + '     ' + hdc1080Res);
+
+	res.send('     ' + hdc1080Res);
 })
 
 app.get('/processor', (req, res) => {
 	tempReadings()
 		.then(data => res.send(data)) ;
+})
+
+app.get('/distance/:distance', (req, res) => {
+    console.log('req: ', new Date(), req.params);
+    res.sendStatus(200)
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
