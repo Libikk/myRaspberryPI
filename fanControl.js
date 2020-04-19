@@ -24,6 +24,7 @@ setInterval(checkTemperature, 4000);
 const tempReadings = () => {
   return shellExec('vcgencmd measure_temp')
   .then(({ stdout }) => {
+	console.log('RESS', stdout)
     const processorTemperature = stdout.replace ( /[^\d.]/g, '' );
     return `
     <div style="display: flex; flex-direction: column;">
@@ -39,7 +40,8 @@ const tempReadings = () => {
       </div>
     </div>
       `
-  });
+  })
+  .catch(console.log)
 }
 
 // circuit http://i.imgur.com/yFuEZMe.png

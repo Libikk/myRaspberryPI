@@ -1,17 +1,43 @@
-var gpio = require('onoff').Gpio;
-var pir = new gpio(21, 'in', 'both');
 const shellExec = require('shell-exec')
+let songNames = [];
+const fs = require('fs');
 
-pir.watch((err, value) => {
-    if (err) console.log('err', err)
+fs.readdir(`${__dirname}/songs/`, (err, files) => (songNames = files));
 
-    if (value == 1) {
-        console.log('Triggered', new Date());
-        const command = `omxplayer ${__dirname}/Akademia-pana-Kleksa-Kleksografia-edited.mp3 -o alsa:hw:1,0`;
-        shellExec(command).catch(console.log)
+const getRandomNum = (min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-    } else {
-        console.log('End', new Date());
-	console.log('______________')
+
+let isPlaying = false;
+let isMotion = false
+
+
+const playMusicOnMotion = (value) => {
+    isMotion = value === 'ON'
+
+    if (isMotion && !isPlaying) {
+        console.log('Start', new Date());
+        isPlaying = true;
+
+        const randomSong = songNames[getRandomNum(0, songNames.length)]
+        console.log('randomSong: ', randomSong);
+        // const command = `omxplayer ${__dirname}/Akademia-pana-Kleksa-Kleksografia-edited.mp3 -o alsa:hw:1,0`;
+        const command = `omxplayer ${__dirname}/songs/${randomSong} -o alsa:hw:1,0`;
+
+        shellExec(command)
+            .then(() => {
+                console.log('End', new Date());
+                isPlaying = false;
+            })
+            .catch(console.log)
     }
-});
+
+}
+
+
+
+
+module.exports = { playMusicOnMotion }

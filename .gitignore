@@ -4,3 +4,4 @@ __pycache__
 restart*.log
 .env
 *.pyc
+*.mp3

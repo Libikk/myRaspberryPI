@@ -5,7 +5,7 @@ require('dotenv').config()
 const port = 3333
 const { tempReadings } = require('./fanControl');
 const hdc1080 = require('./temp-hdc1080/hdc-1080reader');
-require('./motionSensor');
+const { playMusicOnMotion } = require('./motionSensor');
 const schedule = require('node-schedule');
 const dayjs = require('dayjs');
 const axios = require('axios');
@@ -33,6 +33,7 @@ const getDHT10Reading = () => new Promise((resolve, reject) => {
 //     }
 // });
 
+
 app.get('/room', async (req, res) => {
 	const wrapIntoTemplate = (temp, humi, title) => {
 		return `<div>
@@ -44,12 +45,17 @@ app.get('/room', async (req, res) => {
 	}
 	// const HDT10 = await getDHT10Reading().then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'DHT10'))
 
-	const hdc1080Res = await axios.get('http://192.168.1.103/')
+	const hdc1080Res = await axios.get('http://192.168.1.107/')
 		.then(r => r.data)
 		.then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'HDC1080'))
 
 
 	res.send('     ' + hdc1080Res);
+})
+
+app.get('/motion/:status', (req, res) => {
+    playMusicOnMotion(req.params.status);
+    res.sendStatus(200)
 })
 
 app.get('/processor', (req, res) => {
