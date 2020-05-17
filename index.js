@@ -23,15 +23,16 @@ const getDHT10Reading = () => new Promise((resolve, reject) => {
 	});
 })
 
+const beepTimes = async (times = 1, duration = 200) => {
+    for (i = 0; i < times; i++) {
+      await axios.get(`http://192.168.1.100/playBeep?duration=${duration}`)
+    }
+}
 
-// schedule.scheduleJob({ hour: 2, minute: 30 }, async () => {
-//     const endTime = dayjs().add(2, 'hours');
-// 	const restart = require('./restart');
-
-//     while (dayjs().isBefore(endTime)) {
-//         await restart(false);
-//     }
-// });
+schedule.scheduleJob({ hour: 4, minute: 30 }, async () => beepTimes(1));
+schedule.scheduleJob({ hour: 5, minute: 0 }, async () => beepTimes(2));
+schedule.scheduleJob({ hour: 5, minute: 30 }, async () => beepTimes(3));
+schedule.scheduleJob({ hour: 6, minute: 0 }, async () => beepTimes(4, 1000));
 
 
 app.get('/room', async (req, res) => {
