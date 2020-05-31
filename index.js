@@ -59,6 +59,12 @@ app.get('/motion/:status', (req, res) => {
     res.sendStatus(200)
 })
 
+app.get('/playBeep/:duration', async (req, res) => {
+	const durationDefault = 500;
+    await axios.get(`http://192.168.1.151/playBeep?duration=${req.params.status || durationDefault}`)
+    res.sendStatus(200)
+})
+
 app.get('/processor', (req, res) => {
 	tempReadings()
 		.then(data => res.send(data)) ;
