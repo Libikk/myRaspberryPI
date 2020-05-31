@@ -19,17 +19,16 @@ const playMusicOnMotion = (value) => {
     isMotion = value === 'ON'
 
     if (isMotion && !isPlaying) {
-        console.log('Start', new Date());
         isPlaying = true;
 
         const randomSong = songNames[getRandomNum(0, songNames.length)]
-        console.log('randomSong: ', randomSong);
         // const command = `omxplayer ${__dirname}/Akademia-pana-Kleksa-Kleksografia-edited.mp3 -o alsa:hw:1,0`;
         const command = `omxplayer ${__dirname}/songs/${randomSong} -o alsa:hw:1,0`;
 
         shellExec(command)
             .then(() => {
-                console.log('End', new Date());
+                console.log('TRIGGERED', new Date());
+                console.log('________________________');
                 isPlaying = false;
             })
             .catch(console.log)

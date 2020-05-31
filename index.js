@@ -25,7 +25,7 @@ const getDHT10Reading = () => new Promise((resolve, reject) => {
 
 const beepTimes = async (times = 1, duration = 200) => {
     for (i = 0; i < times; i++) {
-      await axios.get(`http://192.168.1.100/playBeep?duration=${duration}`)
+      await axios.get(`http://192.168.1.151/playBeep?duration=${duration}`)
     }
 }
 
@@ -46,7 +46,7 @@ app.get('/room', async (req, res) => {
 	}
 	// const HDT10 = await getDHT10Reading().then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'DHT10'))
 
-	const hdc1080Res = await axios.get('http://192.168.1.107/')
+	const hdc1080Res = await axios.get('http://192.168.1.152/')
 		.then(r => r.data)
 		.then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'HDC1080'))
 
