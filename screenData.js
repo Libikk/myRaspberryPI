@@ -1,6 +1,11 @@
 const axios = require('axios');
 const moment = require('moment');
 
+const credentials = {
+  login: process.env.ESP_LOGIN,
+  password: process.env.ESP_PASSWORD,
+};
+
 let localTemp = '';
 let isRaining = false;
 
@@ -15,16 +20,14 @@ const getLightMode = () => {
 }
 
 const sendData = async () => {
-    const { temperature, humidity } = await axios.get('http://192.168.1.152/').then(r => r.data);
+    const { temperature, humidity } = await axios.get('http://192.168.0.152/api', { headers: credentials }).then(r => r.data);
     const lightMode = getLightMode();
     const line1 = moment().format('YYYY/MM/DD  hh:mm:ss');
     const line2 = '--Room-----Outside--';
     const line3 = `  ${humidity.toFixed(2)}  |   ${isRaining ? 'rain' : ''}`;
     const line4 = `  ${temperature}C |  ${localTemp}C`;
 
-    axios.get(`http://192.168.1.150/spotify?line1=${line1}&line2=${line2}&line3=${line3}&line4=${line4}&screenMode=${lightMode}`)
-        .then(console.log)
-        .catch(console.error)
+    axios.get(`http://192.168.0.150/screen?line1=${line1}&line2=${line2}&line3=${line3}&line4=${line4}&screenMode=${lightMode}`, { headers: credentials })
 }
 
 const getLocalTemperature = () => {

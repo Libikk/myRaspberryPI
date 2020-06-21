@@ -4,11 +4,18 @@ const app = express()
 require('dotenv').config()
 const port = 3333
 const { tempReadings } = require('./fanControl');
+require('./screenData');
 const hdc1080 = require('./temp-hdc1080/hdc-1080reader');
 const { playMusicOnMotion } = require('./motionSensor');
 const schedule = require('node-schedule');
 const dayjs = require('dayjs');
 const axios = require('axios');
+
+const credentials = {
+    login: process.env.ESP_LOGIN,
+    password: process.env.ESP_PASSWORD
+}
+console.log('credentials', credentials);
 
 const images = {
 	DHT10: "https://gr33nonline.files.wordpress.com/2015/09/5-pcs-lot-single-bus-dht11-digital-temperature-and-humidity-sensor-dht11-probe-090345.jpg",
@@ -25,7 +32,7 @@ const getDHT10Reading = () => new Promise((resolve, reject) => {
 
 const beepTimes = async (times = 1, duration = 200) => {
     for (i = 0; i < times; i++) {
-      await axios.get(`http://192.168.1.151/playBeep?duration=${duration}`)
+      await axios.get(`http://192.168.0.151/playBeep?duration=${duration}`, { headers: credentials })
     }
 }
 
@@ -46,9 +53,10 @@ app.get('/room', async (req, res) => {
 	}
 	// const HDT10 = await getDHT10Reading().then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'DHT10'))
 
-	const hdc1080Res = await axios.get('http://192.168.1.152/')
+	const hdc1080Res = await axios.get('http://192.168.0.152/api', { headers: credentials })
 		.then(r => r.data)
 		.then(({ temperature, humidity }) => wrapIntoTemplate(temperature, humidity, 'HDC1080'))
+		.catch(err => console.log('/room errrrrr-rrrr', err))
 
 
 	res.send('     ' + hdc1080Res);
@@ -61,7 +69,8 @@ app.get('/motion/:status', (req, res) => {
 
 app.get('/playBeep/:duration', async (req, res) => {
 	const durationDefault = 500;
-    await axios.get(`http://192.168.1.151/playBeep?duration=${req.params.status || durationDefault}`)
+	await axios.get(`http://192.168.0.151/playBeep?duration=${req.params.status || durationDefault}`, { headers: credentials })
+		.catch(err => console.log('/playBeep/:duration errrrrr-rrrr', err))
     res.sendStatus(200)
 })
 
