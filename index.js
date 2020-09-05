@@ -41,6 +41,14 @@ schedule.scheduleJob({ hour: 5, minute: 0 }, async () => beepTimes(2));
 schedule.scheduleJob({ hour: 5, minute: 30 }, async () => beepTimes(3));
 schedule.scheduleJob({ hour: 6, minute: 0 }, async () => beepTimes(4, 1000));
 
+// breaks
+schedule.scheduleJob({ hour: 10, minute: 30 }, async () => beepTimes(2, 1000));
+schedule.scheduleJob({ hour: 11, minute: 30 }, async () => beepTimes(2, 1000));
+schedule.scheduleJob({ hour: 13, minute: 0 }, async () => beepTimes(2, 1000));
+
+schedule.scheduleJob({ hour: 15, minute: 30 }, async () => beepTimes(2, 1000));
+schedule.scheduleJob({ hour: 17, minute: 30 }, async () => beepTimes(4, 1000));
+
 
 app.get('/room', async (req, res) => {
 	const wrapIntoTemplate = (temp, humi, title) => {
