@@ -18,8 +18,8 @@ const sendDataIntervalTime = 5000;
 const getLightMode = () => {
     var format = 'hh:mm:ss'
     var time = moment(moment(), format),
-      beforeTime = moment('05:30:00', format),
-      afterTime = moment('21:00:00', format);
+      beforeTime = moment('05:00:00', format),
+      afterTime = moment('20:30:00', format);
 
     if (time.isBetween(beforeTime, afterTime)) return 'LIGHT';
     else return 'DARK';

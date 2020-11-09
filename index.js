@@ -32,22 +32,38 @@ const getDHT10Reading = () => new Promise((resolve, reject) => {
 
 const beepTimes = async (times = 1, duration = 200) => {
     for (i = 0; i < times; i++) {
-      await axios.get(`http://192.168.0.151/playBeep?duration=${duration}`, { headers: credentials })
+       await axios.get(`http://192.168.0.151/playBeep?duration=${duration}`, { headers: credentials })
     }
 }
 
-schedule.scheduleJob({ hour: 4, minute: 30 }, async () => beepTimes(1));
-schedule.scheduleJob({ hour: 5, minute: 0 }, async () => beepTimes(2));
+const lightSwitch = (onOrOff) => {
+	axios.get(`http://192.168.0.154/api?switchValue=${onOrOff}`, { headers: credentials })
+		.then(res => console.log('light toggled', res.data))
+		.catch(err => console.log('light switch error:', err))
+}
+
+schedule.scheduleJob({ hour: 5, minute: 0 }, async () => {
+	beepTimes(2)
+});
+
 schedule.scheduleJob({ hour: 5, minute: 30 }, async () => beepTimes(3));
-schedule.scheduleJob({ hour: 6, minute: 0 }, async () => beepTimes(4, 1000));
+schedule.scheduleJob({ hour: 6, minute: 0 }, async () => {
+	beepTimes(4, 1000)
+	lightSwitch('ON')
+});
+
+schedule.scheduleJob({ hour: 7, minute: 0 }, async () => lightSwitch('OFF'));
 
 // breaks
-schedule.scheduleJob({ hour: 10, minute: 30 }, async () => beepTimes(2, 1000));
-schedule.scheduleJob({ hour: 11, minute: 30 }, async () => beepTimes(2, 1000));
+schedule.scheduleJob({ hour: 11, minute: 0 }, async () => beepTimes(2, 1000));
+schedule.scheduleJob({ hour: 12, minute: 0 }, async () => beepTimes(2, 1000));
 schedule.scheduleJob({ hour: 13, minute: 0 }, async () => beepTimes(2, 1000));
 
 schedule.scheduleJob({ hour: 15, minute: 30 }, async () => beepTimes(2, 1000));
 schedule.scheduleJob({ hour: 17, minute: 30 }, async () => beepTimes(4, 1000));
+
+schedule.scheduleJob({ hour: 18, minute: 0 }, async () => lightSwitch('ON'));
+schedule.scheduleJob({ hour: 21, minute: 0 }, async () => lightSwitch('OFF'));
 
 
 app.get('/room', async (req, res) => {
