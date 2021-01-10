@@ -42,17 +42,27 @@ const lightSwitch = (onOrOff) => {
 		.catch(err => console.log('light switch error:', err))
 }
 
+const usbSwitch = (onOrOff) => {
+	axios.get(`http://192.168.0.156/api?switchValue=${onOrOff}`, { headers: credentials })
+		.then(res => console.log('usb toggled', res.data))
+		.catch(err => console.log('usb switch error:', err))
+}
+
 schedule.scheduleJob({ hour: 5, minute: 0 }, async () => {
 	beepTimes(2)
 });
 
-schedule.scheduleJob({ hour: 5, minute: 30 }, async () => beepTimes(3));
-schedule.scheduleJob({ hour: 6, minute: 0 }, async () => {
+schedule.scheduleJob('0 0 6 * * 6,7', async () => beepTimes(3));
+schedule.scheduleJob('0 30 5 * * 0-5', async () => {
 	beepTimes(4, 1000)
+	usbSwitch('ON')
 	lightSwitch('ON')
 });
 
-schedule.scheduleJob({ hour: 7, minute: 0 }, async () => lightSwitch('OFF'));
+schedule.scheduleJob({ hour: 7, minute: 0 }, async () => {
+	usbSwitch('ON')
+	lightSwitch('ON')
+});
 
 // breaks
 schedule.scheduleJob({ hour: 11, minute: 0 }, async () => beepTimes(2, 1000));
@@ -62,8 +72,14 @@ schedule.scheduleJob({ hour: 13, minute: 0 }, async () => beepTimes(2, 1000));
 schedule.scheduleJob({ hour: 15, minute: 30 }, async () => beepTimes(2, 1000));
 schedule.scheduleJob({ hour: 17, minute: 30 }, async () => beepTimes(4, 1000));
 
-schedule.scheduleJob({ hour: 18, minute: 0 }, async () => lightSwitch('ON'));
-schedule.scheduleJob({ hour: 21, minute: 0 }, async () => lightSwitch('OFF'));
+schedule.scheduleJob({ hour: 18, minute: 0 }, async () => {
+	lightSwitch('ON')
+	usbSwitch('ON')
+});
+schedule.scheduleJob({ hour: 21, minute: 0 }, async () => {
+	usbSwitch('OFF')
+	lightSwitch('OFF')
+});
 
 
 app.get('/room', async (req, res) => {
